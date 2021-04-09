@@ -24,8 +24,10 @@ const logFormat = format.combine(
   format.errors({ stack: true }),
   format.printf((info) =>
     info.stack
-      ? `${info.timestamp} ${info.level}: ${info.message}\n${info.stack}`
-      : `${info.timestamp} ${info.level}: ${info.message}`,
+      ? // eslint-disable-next-line
+        `${info.timestamp} ${info.level}: ${info.message}\n${info.stack}`
+      : // eslint-disable-next-line
+        `${info.timestamp} ${info.level}: ${info.message}`,
   ),
   format.splat(),
 );

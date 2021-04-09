@@ -27,11 +27,7 @@ const factory = (sequelize: Sequelize, DataTypes: typeof DataTypesType) => {
     public readonly updatedAt!: Date;
 
     static ALLOWED_ERRORS = {
-      BFX_WS_CLOSE: twiceInFiveMinutes,
-      CHECK_BALANCES_ERROR: onceInFiveMinutes,
-      MONITOR_CONTESTS_ERROR: onceInFiveMinutes,
-      ENTER_CONTEST_ERROR: twiceInFiveMinutes,
-      UPDATE_PRICES_ERROR: onceInFiveMinutes,
+      // EXAMPLE_KEY: twiceInFiveMinutes,
     };
 
     public static handleError = async ({
@@ -47,28 +43,33 @@ const factory = (sequelize: Sequelize, DataTypes: typeof DataTypesType) => {
       data?: unknown;
       dedupKey?: string;
     }) => {
-      let message = key;
-      if (error) {
-        message += ': ' + error;
-      }
-      if (data) {
-        logger.error(`${message} %O`, data);
-        message += ' ' + JSON.stringify(data);
-      } else {
-        logger.error(message);
-      }
+      try {
+        let message = key;
+        if (error) {
+          message += `: ${String(error)}`;
+          logger.error(error);
+        }
+        if (data) {
+          logger.error(`${message} %O`, data);
+          message += ` ${JSON.stringify(data)}`;
+        } else {
+          logger.error(message);
+        }
 
-      const loggedError = await LoggedError.create({
-        key,
-        message: message
-          .replace(new RegExp(`^${key}`), '')
-          .replace(/^:\s/, '')
-          .slice(0, 255),
-        stack: error?.stack,
-        severity,
-        dedupKey,
-      });
-      await loggedError.handleAfterCreate({ data, error });
+        const loggedError = await LoggedError.create({
+          key,
+          message: message
+            .replace(new RegExp(`^${key}`), '')
+            .replace(/^:\s/, '')
+            .slice(0, 255),
+          stack: error?.stack,
+          severity,
+          dedupKey,
+        });
+        await loggedError.handleAfterCreate({ data, error });
+      } catch (e) {
+        logger.error(`Error in handleError, ${String(e)}`);
+      }
     };
 
     _knownError = (

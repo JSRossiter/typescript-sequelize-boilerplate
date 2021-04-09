@@ -2,4 +2,4 @@
 import Main from './workers/Main';
 
 const main = new Main();
-main.start();
+void main.start();
