@@ -1,6 +1,6 @@
 import { ShowPropertyProps } from 'admin-bro';
 import React from 'react';
-import { round } from '../../src/utilities/round';
+import { round } from '../../../src/utilities/round';
 
 const FormattedPropertyValue: React.FC<ShowPropertyProps> = (props) => {
   const { property, record } = props;

@@ -1,13 +1,34 @@
 // import cookieParser from 'cookie-parser';
 import express from 'express';
-import createError from 'http-errors';
+import createError, { HttpError } from 'http-errors';
 import morgan from 'morgan';
+import sslRedirect from './middleware/sslRedirect';
+import adminRouter from './routes/admin';
 // import path from 'path';
 import logger from './utilities/logger';
 
 const app = express();
 
 app.use(morgan('dev', { stream: logger.writeStream }));
+
+app.use(sslRedirect());
+
+app.use('/admin', (req, res, next) => {
+  if (
+    (req.headers['x-forwarded-for'] || req.connection.remoteAddress) !==
+    process.env.ADMIN_ALLOWED_IP
+  ) {
+    logger.warn(
+      'blocking',
+      req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      process.env.ADMIN_ALLOWED_IP,
+    );
+    next(createError(403));
+  } else {
+    next();
+  }
+});
+app.use('/admin', adminRouter);
 
 // // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
@@ -23,16 +44,17 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// error handler
-// @ts-expect-error don't know
-// eslint-disable-next-line
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
+app.use(function (
+  err: HttpError,
+  req: express.Request,
+  res: express.Response,
+  // eslint-disable-next-line
+  _next: express.NextFunction,
+) {
   logger.error(err);
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.message = err.message || err.status || 500;
+  // res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });

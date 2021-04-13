@@ -12,6 +12,7 @@ import { user } from './models/user';
 AdminBro.registerAdapter(AdminBroSequelize);
 
 const adminBroOptions: AdminBroOptions = {
+  databases: [db],
   resources: [user, loggedError],
   // dashboard: {
   //   handler: dashboardHandler,
@@ -22,7 +23,7 @@ const adminBroOptions: AdminBroOptions = {
 
 const adminBro = new AdminBro(adminBroOptions);
 if (process.env.NODE_ENV !== 'production') {
-  adminBro.watch();
+  void adminBro.watch();
 }
 
 const authenticationOptions = {

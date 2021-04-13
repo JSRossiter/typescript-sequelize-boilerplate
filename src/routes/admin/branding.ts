@@ -1,6 +1,6 @@
-let companyName = `HXRO`;
+let companyName = 'example';
 if (process.env.NODE_ENV !== 'production') {
-  companyName += ' - ' + process.env.NODE_ENV;
+  companyName += ` - ${process.env.NODE_ENV}`;
 }
 export const branding = {
   companyName,

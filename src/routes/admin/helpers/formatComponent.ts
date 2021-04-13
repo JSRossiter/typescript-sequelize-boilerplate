@@ -1,7 +1,7 @@
 import AdminBro from 'admin-bro';
 
 const formatComponent = AdminBro.bundle(
-  '../../../../views/admin/FormattedPropertyValue.tsx',
+  '../../../../views/admin/components/FormattedPropertyValue.tsx',
 );
 export const formattedNumber = {
   components: { list: formatComponent },
